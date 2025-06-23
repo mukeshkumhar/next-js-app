@@ -19,7 +19,6 @@ export async function connectToDatabase() {
     }
 
     if (!cached.promise) {
-
         const opts = {
             bufferCommands: false,
             useNewUrlParser: true,
@@ -27,14 +26,13 @@ export async function connectToDatabase() {
             maxPoolSize: 10, // Adjust as needed
             serverSelectionTimeoutMS: 5000, // Adjust as needed
             socketTimeoutMS: 45000, // Adjust as needed
-        }
+        };
 
-        
-        mongoose.connect(MONGODB_URI)
-        .then(() => mongoose.connection)
+        // mongoose.connect(MONGODB_URI, opts);
+        mongoose.connect(MONGODB_URI).then(() => mongoose.connection);
     }
 
-    try{
+    try {
         cached.conn = await cached.promise;
     } catch (error) {
         cached.promise = null;
