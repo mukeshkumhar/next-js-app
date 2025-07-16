@@ -33,18 +33,58 @@ const FileUpload = ({onSuccess, onProgress, fileTypes}: FileUploadProps) => {
     return true;
   };
 
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !validateFile(file)) {
+      return;
+    }
+    setUploading(true);
+    setError(null);
+    try {
+      const AuthRes = await fetch("/api/auth/imagekit-auth");
+      const authData = await AuthRes.json();
+
+      const res = await upload({
+        file,
+        fileName: file.name,
+        publicKey: process.env.Next_ImageKit_Public_Key!,
+        signature: authData.signature,
+        expire: authData.expire,
+        token: authData.token,
+        onProgress: (event) =>{
+          if(event.lengthComputable && onProgress){
+            const progress = Math.round((event.loaded / event.total) * 100);
+            onProgress(Math.round(progress));
+          }
+        }
+      });
+      onSuccess?.(res);
+    } catch (error) {
+      console.error("Upload failed:", error);
+      setUploading(false);
+      if (error instanceof ImageKitInvalidRequestError) {
+        setError("Invalid request. Please check the file and try again.");
+      } else if (error instanceof ImageKitServerError) {
+        setError("Server error. Please try again later.");
+      } else if (error instanceof ImageKitUploadNetworkError) {
+        setError("Network error. Please check your connection.");
+      } else if (error instanceof ImageKitAbortError) {
+        setError("Upload aborted.");
+      } else {
+        setError("An unexpected error occurred.");
+      }
+    }
+  }
+
 
   return (
     <>
-
-      <input type="file" ref={fileInputRef} />
-
-      <button type="button" onClick={handleUpload}>
-        Upload file
-      </button>
-      <br />
-
-      Upload progress: <progress value={progress} max={100}></progress>
+      <input
+        type="file"
+        accept={fileTypes === "video" ? "video/*" : "image/*"}
+        onChange={handleFileChange}
+      />
+      {uploading && (<span>Uploading...</span>)}
     </>
   );
 };
