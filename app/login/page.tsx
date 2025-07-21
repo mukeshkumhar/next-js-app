@@ -18,7 +18,7 @@ function LoginPage() {
             if (result?.error) {
                 alert("Login failed: " + result.error);
             } else {
-                router.push("/");
+                router.push("/home"); // Redirect to home page on success
             }
         })
     }

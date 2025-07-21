@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import React from "react";
 
 function RegisterPage() {
-
+  const [username, setUsername] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
@@ -23,21 +23,24 @@ function RegisterPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({username, email, password }),
       })
+
+      const data = await res.json();
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Registration failed");
+        // const errorData = await res.json();
+        throw new Error(data.error || "Registration failed");
+        
       }
       
-      const data = await res.json();
       alert("Registration successful");
       console.log(data);
-      router.push("/login");
+      router.push("/home");
 
     } catch (error) {
       console.error("Registration error:", error);
       alert("Failed to register. Please try again.");
+      console.error("Error details:", error);
       
     }
   };
@@ -46,6 +49,14 @@ function RegisterPage() {
     <div className="flex flex-col items-center justify-center h-screen">
       <h1 className="text-2xl font-bold">Register Page</h1>
       <form onSubmit={handleRegister} className="flex flex-col space-y-4 mt-4">
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          className="p-2 border rounded"
+          required
+        />
         <input
           type="email"
           placeholder="Email"

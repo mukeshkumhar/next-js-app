@@ -8,7 +8,7 @@ type FetchOptions = {
 }
 
 class ApiClient {
-    private async featch<T>(
+    private async fetch<T>(
         endpoint: string,
         options: FetchOptions = {}
     ): Promise<T> {
@@ -19,26 +19,26 @@ class ApiClient {
             ...headers
         }
 
-        const responce = await fetch('/api${endpoint}',{
+        const response = await fetch('/api${endpoint}',{
             method,
             headers: defaultHeaders,
             body: body ? JSON.stringify(body) : undefined
         })
 
-        if (!responce.ok) {
-            throw new Error(await responce.text());
+        if (!response.ok) {
+            throw new Error(await response.text());
         }
 
-        return responce.json()
+        return response.json()
     }
 
 
     async getVideos() {
-        return this.featch("/videos");
+        return this.fetch("/videos");
     }
 
     async createVideo(videData: VideoFormData){
-        return this.featch<IVideo>("/videos", {
+        return this.fetch<IVideo>("/videos", {
             method: "POST",
             body: videData
         });
