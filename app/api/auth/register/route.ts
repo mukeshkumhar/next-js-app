@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
         const user = new User({ username, email, password });
         await user.save();
 
-        return NextResponse.json({ message: "User registered successfully" });
+        return NextResponse.json({ message: "User registered successfully", user });
     } catch (error) {
         console.error("Error in registration:", error);
         return NextResponse.json(
